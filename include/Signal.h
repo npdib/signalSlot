@@ -10,12 +10,12 @@
 
 namespace npdib
 {
-
     /* This is a templated class which takes the arguments of the functions that it connects to
 
     You can then connect functions of this type to this signal. when emitted with a certain set of parameters, these parameters are stored with an index and ran when the loop gets to them.
 
     */
+
     template<typename... Arguments>
     class Signal : public ISignal
     {
@@ -67,11 +67,6 @@ namespace npdib
         }
 
     private:
-        std::vector <std::function<void(Arguments...)>> mFunctions;     // all connected functions
-        std::map<uint16_t, std::tuple<Arguments...>> mArgumentMap;      // map between indices and arguments
-
-        uint16_t mCurrentIndex;
-
         // Helper method to unpack the tuple
         template<std::size_t... Is>
         void unpackAndRunFunctions(const std::tuple<Arguments...>& tuple, std::index_sequence<Is...>) const
@@ -79,6 +74,10 @@ namespace npdib
             for (const auto& function : mFunctions)
                 function(std::get<Is>(tuple)...);
         }
-    };
 
+        std::vector <std::function<void(Arguments...)>> mFunctions;     // all connected functions
+        std::map<uint16_t, std::tuple<Arguments...>> mArgumentMap;      // map between indices and arguments
+
+        uint16_t mCurrentIndex;
+    };
 }

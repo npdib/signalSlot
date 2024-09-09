@@ -33,5 +33,4 @@ namespace npdib
 		using SignalPacket = std::pair<ISignal*, uint16_t>;
 		std::queue<SignalPacket> mQueue;			// queue of incoming signals
 	};
-
 }

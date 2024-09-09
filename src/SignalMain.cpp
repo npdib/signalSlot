@@ -2,7 +2,6 @@
 
 namespace npdib
 {
-
 	SignalMain& SignalMain::get()
 	{
 		static SignalMain sSignalMain;
