@@ -1,19 +1,24 @@
 #include "SignalMain.h"
 
-SignalMain& SignalMain::get()
+namespace npdib
 {
-	static SignalMain sSignalMain;
-	return sSignalMain;
-}
 
-void SignalMain::run()
-{
-	while (true)
+	SignalMain& SignalMain::get()
 	{
-		if (mQueue.size() > 0)
+		static SignalMain sSignalMain;
+		return sSignalMain;
+	}
+
+	void SignalMain::run()
+	{
+		while (true)
 		{
-			mQueue.front()->call();		// call connected functions
-			mQueue.pop();				// remove from queue
+			if (mQueue.size() > 0)
+			{
+				const auto [signal, index] = mQueue.front();
+				signal->call(index);		// call connected functions
+				mQueue.pop();				// remove from queue
+			}
 		}
 	}
 }

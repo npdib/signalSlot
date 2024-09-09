@@ -1,13 +1,16 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
-#include <functional>
 
-class ISignal
+namespace npdib
 {
-public:
-	virtual void emit()			{ std::cout << "parent emit\n";	}
-	virtual void call()			{ std::cout << "parent call\n"; }
-	virtual void connect()		{ std::cout << "parent connect\n"; }
-};
+
+	class ISignal
+	{
+	public:
+		void emit() { std::cout << "parent emit\n"; }
+		virtual void call(uint16_t index) { std::cout << "parent call\n"; }
+		void connect() { std::cout << "parent connect\n"; }
+	};
+
+}
