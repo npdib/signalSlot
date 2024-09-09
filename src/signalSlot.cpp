@@ -1,10 +1,11 @@
 // signalSlot.cpp : Defines the functions for the static library.
 //
+#include "signalSlot.h"
 
-#include "framework.h"
 
 // TODO: This is an example of a library function
-void fnsignalSlot()
+std::string testFn()
 {
+	return "Hello, my name is Nick!";
 }
  
