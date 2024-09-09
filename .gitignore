@@ -1,4 +1,4 @@
-repo/.vs/
-repo/x64/
-repo/signalSlot.vcxproj.filters
-repo/signalSlot.vcxproj.user
+.vs/
+x64/
+signalSlot.vcxproj.filters
+signalSlot.vcxproj.user
