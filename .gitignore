@@ -2,3 +2,4 @@
 x64/
 signalSlot.vcxproj.filters
 signalSlot.vcxproj.user
+out/
