@@ -13,7 +13,7 @@ project ("signalSlot")
 
 add_library (signalSlot "src/SignalMain.cpp")
 
-target_include_directories(signalSlot PUBLIC "${CMAKE_SOURCE_DIR}/include")
+target_include_directories(signalSlot PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET signalSlot PROPERTY CXX_STANDARD 20)
