@@ -44,7 +44,7 @@ namespace npdib
         // call functions with arguments from the map
         void call(uint16_t index) override      
         {
-            if (!mArgumentMap.contains(index))
+            if (mArgumentMap.count(index) == 0)
             {
                 std::cout << "the index didnt exist, oops";
                 return;
