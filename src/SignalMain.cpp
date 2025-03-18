@@ -12,12 +12,23 @@ namespace npdib
 	{
 		while (true)
 		{
-			if (mQueue.size() > 0)
+			if (!mQueue.empty())
 			{
+				std::unique_lock lock(mQueueMutex);
 				const auto [signal, index] = mQueue.front();
+
+				lock.unlock();
 				signal->call(index);		// call connected functions
+
+				lock.lock();
 				mQueue.pop();				// remove from queue
 			}
 		}
 	}
+
+    void SignalMain::addToQueue(const SignalPacket& packet)
+    {
+		std::scoped_lock lock(mQueueMutex);
+		mQueue.push(packet);
+    }
 }
