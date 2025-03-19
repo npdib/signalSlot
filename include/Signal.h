@@ -5,7 +5,7 @@
 #include <functional>
 #include <map>
 
-#include "ISignal.h"
+#include "SignalBase.h"
 #include "SignalMain.h"
 
 
@@ -18,21 +18,21 @@ namespace npdib
     */
 
     template <typename... Arguments>
-    class Signal : public ISignal
+    class Signal : public SignalBase
     {
     public:
         Signal()
-            : mCurrentIndex(0)
+            : m_currentIndex(0)
         {
         }
 
         // push an event onto the event queue
         void emit(Arguments... args)
         {
-            SignalMain::get().addToQueue({this, mCurrentIndex});             
+            SignalMain::get().addToQueue({this, m_currentIndex});             
 
-            std::scoped_lock lock(mArgumentMapMutex);
-            mArgumentMap[mCurrentIndex++] = std::tuple<Arguments...>(args...);  // store the arguments in the map against the index
+            std::scoped_lock lock(m_argumentMapMutex);
+            m_argumentMap[m_currentIndex++] = std::tuple<Arguments...>(args...);  // store the arguments in the map against the index
 
 #ifdef DEBUG
             std::cout << "derived emit\n";
@@ -42,8 +42,8 @@ namespace npdib
         // directly run all connected functions with a set of arguments
         void run(Arguments... args)  
         {
-            std::unique_lock lock(mFunctionMutex);
-            for (const auto& function : mFunctions)
+            std::unique_lock lock(m_functionMutex);
+            for (const auto& function : m_functions)
             {
                 lock.unlock();
                 function(args...);
@@ -54,20 +54,20 @@ namespace npdib
         // call functions with arguments from the map
         void call(uint16_t index) override      
         {
-            std::unique_lock lock(mArgumentMapMutex);
-            if (!mArgumentMap.contains(index))
+            std::unique_lock lock(m_argumentMapMutex);
+            if (!m_argumentMap.contains(index))
             {
                 std::cout << "the index didnt exist, oops";
                 return;
             }
 
-            const std::tuple<Arguments...> tuple = mArgumentMap[index];
+            const std::tuple<Arguments...> tuple = m_argumentMap[index];
 
             lock.unlock();
             unpackAndRunFunctions(tuple, std::index_sequence_for<Arguments...>());
 
             lock.lock();
-            mArgumentMap.erase(index);
+            m_argumentMap.erase(index);
 
 #ifdef DEBUG
             std::cout << "derived call\n";
@@ -75,10 +75,10 @@ namespace npdib
         }
 
         // connect a function to the signal
-        void connect(std::function<void(Arguments...)> func)
+        void connect(std::function<void(Arguments...)>&& func)
         {
-            std::scoped_lock lock(mFunctionMutex);
-            mFunctions.push_back(func);
+            std::scoped_lock lock(m_functionMutex);
+            m_functions.push_back(std::move(func));
 
 #ifdef DEBUG
             std::cout << "derived connect\n";
@@ -90,8 +90,8 @@ namespace npdib
         template <std::size_t... Is>
         void unpackAndRunFunctions(const std::tuple<Arguments...>& tuple, std::index_sequence<Is...>)
         {
-            std::unique_lock lock(mFunctionMutex);
-            for (const auto& function : mFunctions)
+            std::unique_lock lock(m_functionMutex);
+            for (const auto& function : m_functions)
             {
                 lock.unlock();
                 function(std::get<Is>(tuple)...);
@@ -99,12 +99,12 @@ namespace npdib
             }
         }
 
-        std::mutex mFunctionMutex;
-        std::vector<std::function<void(Arguments...)>> mFunctions;     // all connected functions
+        std::mutex m_functionMutex;
+        std::vector<std::function<void(Arguments...)>> m_functions;     // all connected functions
 
-        std::mutex mArgumentMapMutex;
-        std::map<uint16_t, std::tuple<Arguments...>> mArgumentMap;      // map between indices and arguments
+        std::mutex m_argumentMapMutex;
+        std::map<uint16_t, std::tuple<Arguments...>> m_argumentMap;      // map between indices and arguments
 
-        uint16_t mCurrentIndex;
+        uint16_t m_currentIndex;
     };
 }

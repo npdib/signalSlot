@@ -3,7 +3,7 @@
 #include <mutex>
 #include <queue>
 
-#include "ISignal.h"
+#include "SignalBase.h"
 
 /* SignalMain
 
@@ -22,8 +22,9 @@ namespace npdib
 	public:
 		static SignalMain& get();								// singleton getter
 
-		void run();												// run the main Signal Loop
-		using SignalPacket = std::pair<ISignal*, uint16_t>;
+		void run();											// run the main Signal Loop
+		void quit() { m_run = false; }
+		using SignalPacket = std::pair<SignalBase*, uint16_t>;
 		void addToQueue(const SignalPacket& packet);
 
 		// explicitly delete constructor and equality
@@ -33,7 +34,9 @@ namespace npdib
 	private:
 		SignalMain() = default;
 
-		std::mutex mQueueMutex;
-		std::queue<SignalPacket> mQueue;			// queue of incoming signals
+		std::atomic<bool> m_run;
+
+		std::mutex m_queueMutex;
+		std::queue<SignalPacket> m_queue;			// queue of incoming signals
 	};
 }
